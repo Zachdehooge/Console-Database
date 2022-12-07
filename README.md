@@ -2,7 +2,7 @@
 
 > A console application that creates a new local SQLite database and allows the user to interact with the database through the console
 
-![](console-app.png)
+![](Console-app.png)
 
 ## Installation
 
