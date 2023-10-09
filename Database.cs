@@ -4,34 +4,17 @@ namespace ConsoleApp1;
 
 public class Database
 {
-    public SqliteConnection connection;
-
-    public Database()
+    public SqliteConnection Connection;
+    public void CheckDatabase()
     {
-        
-        connection = new SqliteConnection("Data Source=database.sqlite3");
-        CloseConnection();
-
         if (!File.Exists("./database.sqlite3"))
         {
             File.Create("database.sqlite3");
             Console.WriteLine("Database Created...");
         }
-    }
-    
-    public void OpenConnection()
-    {
-        if (connection.State != System.Data.ConnectionState.Open)
+        else if(File.Exists("database.sqlite3"))
         {
-            connection.Open();
-        }
-    }
-
-    public void CloseConnection()
-    {
-        if (connection.State != System.Data.ConnectionState.Closed)
-        {
-            connection.Close();
+            Console.WriteLine("Database Already Exists...");
         }
     }
 
@@ -42,7 +25,7 @@ public class Database
         string databaseCreateQuery =
             "CREATE TABLE people (id int, firstname text, lastname text)";
             
-        SqliteCommand createCommand = new SqliteCommand(databaseCreateQuery, connection);
+        SqliteCommand createCommand = new SqliteCommand(databaseCreateQuery, Connection);
 
         createCommand.ExecuteNonQuery();
 
@@ -60,7 +43,7 @@ public class Database
         string? last = Console.ReadLine();
             
         string databaseAddQuery = "INSERT INTO people ('firstname', 'lastname') VALUES (@firstname, @lastname)";
-        SqliteCommand addCommand = new SqliteCommand(databaseAddQuery, connection);
+        SqliteCommand addCommand = new SqliteCommand(databaseAddQuery, Connection);
 
         addCommand.Parameters.AddWithValue("@firstname", first); //Adds first name
         addCommand.Parameters.AddWithValue("@lastname", last); //Adds last name
@@ -74,7 +57,7 @@ public class Database
 
         string databaseGetQuery = "SELECT * FROM people";
 
-        SqliteCommand getCommand = new SqliteCommand(databaseGetQuery, connection);
+        SqliteCommand getCommand = new SqliteCommand(databaseGetQuery, Connection);
             
         SqliteDataReader getDatabaseResults= getCommand.ExecuteReader();
         if (getDatabaseResults.HasRows)
@@ -89,22 +72,19 @@ public class Database
         Console.WriteLine();
     }
 
-    public int Starter()
-    {
-        Console.WriteLine("Would you like to: \n" + "[1] Create a new database\n" + "[2] Add a name to database\n" + "[3] Return database results\n" + "[4] Exit");
-        int answer = Convert.ToInt32(Console.ReadLine());
-
-        return answer;
-    }
-
     public void Logic()
     {
+        CheckDatabase();
+        
+        Connection = new SqliteConnection("Data Source=database.sqlite3");
+        
+        Connection.Open();
+        
         Console.WriteLine();
-        Console.WriteLine("Would you like to: \n" + "[1] Create a new table\n" + "[2] Add a name to database\n" + "[3] Return database results\n" + "[4] Exit");
+        Console.WriteLine("[1] Create a new table\n" + "[2] Add a name to database\n" + "[3] Return database results\n" + "[4] Exit\n" + "Would you like to: ");
+        
         int answer = Convert.ToInt32(Console.ReadLine());
         Console.WriteLine();
-        
-        OpenConnection();
         
         if (answer == 1)
         {
@@ -129,12 +109,8 @@ public class Database
         }
         else
         {
-            CloseConnection();
+            Connection.Close();
             Environment.Exit(0);
         }
-    }
-    public void Tread()
-    {
-        Logic();
     }
 }
